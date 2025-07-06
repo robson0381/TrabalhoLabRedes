@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  prog3:
+    build: ./prog3
+    container_name: prog3
+    volumes:
+      - shared_tmp:/tmp
+    networks:
+      - rede_prog
+
+  prog2:
+    build: ./prog2
+    container_name: prog2
+    volumes:
+      - shared_tmp:/tmp
+    networks:
+      - rede_prog
+
+  prog1:
+    build: ./prog1
+    container_name: prog1
+    volumes:
+      - shared_tmp:/tmp
+    networks:
+      - rede_prog
+    stdin_open: true
+    tty: true
+
+networks:
+  rede_prog:
+    driver: bridge
+
+volumes:
+  shared_tmp:
