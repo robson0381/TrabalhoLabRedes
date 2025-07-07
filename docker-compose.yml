@@ -1,35 +1,30 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  prog3:
-    build: ./prog3
-    container_name: prog3
-    volumes:
-      - shared_tmp:/tmp
+  prog1:
+    image: robson0381/trabalho_prog1
+    container_name: prog1
     networks:
-      - rede_prog
+      - trabalho_rede
+    stdin_open: true
+    tty: true
 
   prog2:
-    build: ./prog2
+    image: robson0381/trabalho_prog2
     container_name: prog2
-    volumes:
-      - shared_tmp:/tmp
     networks:
-      - rede_prog
+      - trabalho_rede
+    stdin_open: true
+    tty: true
 
-  prog1:
-    build: ./prog1
-    container_name: prog1
-    volumes:
-      - shared_tmp:/tmp
+  prog3:
+    image: robson0381/trabalho_prog3
+    container_name: prog3
     networks:
-      - rede_prog
+      - trabalho_rede
     stdin_open: true
     tty: true
 
 networks:
-  rede_prog:
+  trabalho_rede:
     driver: bridge
-
-volumes:
-  shared_tmp:
