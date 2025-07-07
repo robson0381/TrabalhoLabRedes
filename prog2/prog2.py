@@ -1,26 +1,36 @@
 import socket
 import pickle
 import numpy as np
+import time
+import os
+
+def aguarda_arquivo(path, timeout=30):
+    """Espera arquivo existir até timeout (em segundos)."""
+    for _ in range(timeout):
+        if os.path.exists(path):
+            return
+        print(f"Aguardando {path} ser criado por prog3...")
+        time.sleep(1)
+    raise TimeoutError(f"Timeout esperando {path}")
 
 def main():
     HOST_PROG3 = 'prog3'
-    PORT_INFO = 7000  # porta fixa
+    PATH_PORTA_PROG3 = '/tmp/porta_prog3.txt'
 
-    # conecta para descobrir a porta
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((HOST_PROG3, PORT_INFO))
-        PORT_PROG3 = int(s.recv(1024).decode())
-
-    print(f"prog2 vai conectar ao prog3 em {HOST_PROG3}:{PORT_PROG3}")
-
-    # abre socket para receber prog1
     HOST_PROG2 = '0.0.0.0'
     PORT_PROG2 = 6000
 
+    # Abre socket servidor primeiro
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((HOST_PROG2, PORT_PROG2))
         server_socket.listen()
         print(f"prog2 aguardando conexão de prog1 na porta {PORT_PROG2}...")
+
+        # Aguarda arquivo da porta de prog3
+        aguarda_arquivo(PATH_PORTA_PROG3)
+        with open(PATH_PORTA_PROG3) as f:
+            PORT_PROG3 = int(f.read().strip())
+        print(f"prog2 vai conectar ao prog3 em {HOST_PROG3}:{PORT_PROG3}")
 
         while True:
             conn, addr = server_socket.accept()
@@ -48,7 +58,6 @@ def main():
                     'start_time': start_time
                 }
 
-                # conecta ao prog3 para enviar resultado
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_to_prog3:
                     client_to_prog3.connect((HOST_PROG3, PORT_PROG3))
                     client_to_prog3.sendall(pickle.dumps(pacote_resultado))
