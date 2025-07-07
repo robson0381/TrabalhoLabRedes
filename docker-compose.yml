@@ -9,14 +9,15 @@ services:
     stdin_open: true
     tty: true
 
-  prog2:
+    prog2:
     image: robson0381/trabalho_prog2
     container_name: prog2
     networks:
       - trabalho_rede
     stdin_open: true
     tty: true
-
+    command: python prog2.py
+    
   prog3:
     image: robson0381/trabalho_prog3
     container_name: prog3
