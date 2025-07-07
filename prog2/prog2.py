@@ -6,21 +6,21 @@ import os
 
 def main():
     HOST_PROG3 = 'prog3'
+    ARQUIVO_PORTA = '/tmp/porta_prog3.txt'
 
-    # espera o arquivo aparecer
-    while not os.path.exists('/tmp/porta_prog3.txt'):
-        print("Aguardando arquivo de porta do prog3...")
+    # aguarda o arquivo aparecer
+    while not os.path.exists(ARQUIVO_PORTA):
+        print(f"Aguardando {ARQUIVO_PORTA} ser criado por prog3...")
         time.sleep(1)
 
     # lê a porta escolhida por prog3 (escrita no arquivo)
-    with open('/tmp/porta_prog3.txt') as f:
+    with open(ARQUIVO_PORTA) as f:
         PORT_PROG3 = int(f.read().strip())
 
     print(f"prog2 vai conectar ao prog3 em {HOST_PROG3}:{PORT_PROG3}")
 
-    # abre socket para receber prog1
     HOST_PROG2 = '0.0.0.0'
-    PORT_PROG2 = 6000  # fixa para prog1
+    PORT_PROG2 = 6000
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((HOST_PROG2, PORT_PROG2))
@@ -53,7 +53,6 @@ def main():
                     'start_time': start_time
                 }
 
-                # conecta ao prog3 para enviar resultado
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_to_prog3:
                     client_to_prog3.connect((HOST_PROG3, PORT_PROG3))
                     client_to_prog3.sendall(pickle.dumps(pacote_resultado))
