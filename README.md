@@ -1,78 +1,33 @@
-Trabalho de Redes — Matrizes com Docker
-Este projeto implementa um sistema distribuído para geração, processamento e cálculo de determinantes de matrizes via sockets TCP, utilizando 3 programas em Python, orquestrados com Docker e Docker Compose.
+# Trabalho de Redes — Matrizes com Docker
 
-📁 Estrutura do projeto
-Copiar
-Editar
-TrabalhoLabRedes/
-├── prog1/
-│   ├── Dockerfile
-│   └── prog1.py
-├── prog2/
-│   ├── Dockerfile
-│   └── prog2.py
-├── prog3/
-│   ├── Dockerfile
-│   └── prog3.py
-├── docker-compose.yml
-└── README.md
-🚀 Requisitos
-Docker instalado.
+Este projeto implementa três programas (`prog1`, `prog2`, `prog3`) que se comunicam por sockets TCP para calcular determinantes de matrizes. Os programas rodam em containers Docker conectados por uma rede bridge. O código está versionado no GitHub.
 
-Docker Compose instalado.
+Pré-requisitos: Docker, Docker Compose, Git instalados. No Windows recomenda-se rodar os comandos no terminal Git Bash.
 
-Git (opcional, para clonar o repositório).
+Para executar:
 
-🔧 Como executar
-1️⃣ Clone o repositório
-bash
-Copiar
-Editar
+1. Clone o repositório:
 git clone https://github.com/robson0381/TrabalhoLabRedes.git
 cd TrabalhoLabRedes
-2️⃣ Suba os containers
-bash
-Copiar
-Editar
+
+2. Construa e suba os containers:
 docker compose up --build
-Isso criará a rede e iniciará os 3 containers (prog1, prog2, prog3).
 
-Você verá que prog3 imprimirá a porta em que está escutando e prog2 ficará aguardando a criação do arquivo da porta.
+Os containers `prog1`, `prog2` e `prog3` serão criados e conectados à rede. No terminal você verá `prog3` escutando em uma porta e `prog2` aguardando conexão de `prog1`.
 
-🖥️ Execução dos programas
-Programa 3 — já iniciado
-No log do docker compose up, você verá algo como:
+3. Em um terminal separado, execute o prog2:
+docker exec -it prog2 bash
+python prog2.py
 
-nginx
-Copiar
-Editar
-prog3 | prog3 escutando na porta 32000...
-Programa 2 — já iniciado
-No log do docker compose up, você verá prog2 aguardando conexão do prog1.
+O `prog2` ficará aguardando conexão de `prog1`.
 
-Programa 1 — rodar manualmente
-Abra um novo terminal e execute:
-
-bash
-Copiar
-Editar
+4. Em outro terminal separado, execute o prog1:
 docker exec -it prog1 bash
-Dentro do container:
-
-bash
-Copiar
-Editar
 python prog1.py
-Siga as instruções para informar a ordem e a quantidade de matrizes. Ele enviará as matrizes para prog2 que processará e enviará o resultado para prog3.
 
-🧹 Finalizar containers
-Quando quiser parar:
+Digite a ordem das matrizes e a quantidade quando solicitado. O `prog1` enviará os dados para `prog2`, que calculará e enviará os resultados para `prog3`.
 
-bash
-Copiar
-Editar
+Os resultados aparecerão no terminal onde `prog3` está rodando.
+
+Para parar os containers após o teste:
 docker compose down
-📖 Observações
-O programa só funciona corretamente com os 3 containers rodando.
-
-É necessário esperar prog3 criar o arquivo de porta antes de prog2 continuar.
