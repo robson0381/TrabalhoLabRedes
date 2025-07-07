@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   prog1:
     image: robson0381/trabalho_prog1
