@@ -2,9 +2,15 @@ import socket
 import pickle
 import numpy as np
 import time
+import os
 
 def main():
     HOST_PROG3 = 'prog3'
+
+    # espera o arquivo aparecer
+    while not os.path.exists('/tmp/porta_prog3.txt'):
+        print("Aguardando arquivo de porta do prog3...")
+        time.sleep(1)
 
     # lê a porta escolhida por prog3 (escrita no arquivo)
     with open('/tmp/porta_prog3.txt') as f:

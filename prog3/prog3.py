@@ -1,6 +1,7 @@
 import socket
 import pickle
 import time
+import os
 
 def main():
     HOST = '0.0.0.0'
@@ -10,9 +11,13 @@ def main():
         s.bind((HOST, PORT))
         PORT = s.getsockname()[1]  # lê a porta escolhida pelo sistema
 
-        # escreve a porta escolhida num arquivo para que prog2 saiba
-        with open('/tmp/porta_prog3.txt', 'w') as f:
+        # garante que o diretório existe e escreve a porta escolhida num arquivo
+        tmp_file = '/tmp/porta_prog3.txt'
+        os.makedirs(os.path.dirname(tmp_file), exist_ok=True)
+
+        with open(tmp_file, 'w') as f:
             f.write(str(PORT))
+            f.flush()  # força gravação imediata
 
         print(f"prog3 escutando na porta {PORT}...")
 

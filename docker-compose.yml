@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   prog1:
     image: robson0381/trabalho_prog1
@@ -14,7 +16,10 @@ services:
       - trabalho_rede
     stdin_open: true
     tty: true
-    command: python prog2.py
+    depends_on:
+      - prog3
+    volumes:
+      - tmp-data:/tmp
 
   prog3:
     image: robson0381/trabalho_prog3
@@ -23,7 +28,12 @@ services:
       - trabalho_rede
     stdin_open: true
     tty: true
+    volumes:
+      - tmp-data:/tmp
 
 networks:
   trabalho_rede:
     driver: bridge
+
+volumes:
+  tmp-data:
