@@ -1,26 +1,6 @@
 version: "3.8"
 
 services:
-  prog3:
-    image: robson0381/trabalho_prog3
-    container_name: prog3
-    networks:
-      - trabalho_rede
-    stdin_open: true
-    tty: true
-    command: python prog3.py
-
-  prog2:
-    image: robson0381/trabalho_prog2
-    container_name: prog2
-    networks:
-      - trabalho_rede
-    stdin_open: true
-    tty: true
-    depends_on:
-      - prog3
-    command: python prog2.py
-
   prog1:
     image: robson0381/trabalho_prog1
     container_name: prog1
@@ -28,8 +8,26 @@ services:
       - trabalho_rede
     stdin_open: true
     tty: true
-    depends_on:
-      - prog2
+
+  prog2:
+    image: robson0381/trabalho_prog2
+    container_name: prog2
+    networks:
+      - trabalho_rede
+    volumes:
+      - /tmp/prog_shared:/tmp
+    stdin_open: true
+    tty: true
+
+  prog3:
+    image: robson0381/trabalho_prog3
+    container_name: prog3
+    networks:
+      - trabalho_rede
+    volumes:
+      - /tmp/prog_shared:/tmp
+    stdin_open: true
+    tty: true
 
 networks:
   trabalho_rede:
