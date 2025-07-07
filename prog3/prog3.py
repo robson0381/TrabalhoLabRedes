@@ -1,47 +1,51 @@
 import socket
 import pickle
+import threading
 import time
-import os
 
 def main():
     HOST = '0.0.0.0'
-    PORT = 0  # 0 → sistema escolhe porta livre automaticamente
+    PORT_INFO = 7000  # porta fixa para registrar
 
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
-        PORT = s.getsockname()[1]  # lê a porta escolhida pelo sistema
+    # cria socket dinâmico
+    data_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    data_socket.bind((HOST, 0))
+    DATA_PORT = data_socket.getsockname()[1]
+    print(f"prog3 escutando para dados na porta {DATA_PORT}...")
 
-        # garante que o diretório existe e escreve a porta escolhida num arquivo
-        tmp_file = '/tmp/porta_prog3.txt'
-        os.makedirs(os.path.dirname(tmp_file), exist_ok=True)
+    data_socket.listen()
 
-        with open(tmp_file, 'w') as f:
-            f.write(str(PORT))
-            f.flush()  # força gravação imediata
+    # thread para informar a porta
+    def info_server():
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as info_socket:
+            info_socket.bind((HOST, PORT_INFO))
+            info_socket.listen()
+            while True:
+                conn, _ = info_socket.accept()
+                with conn:
+                    conn.sendall(str(DATA_PORT).encode())
 
-        print(f"prog3 escutando na porta {PORT}...")
+    threading.Thread(target=info_server, daemon=True).start()
 
-        s.listen()
-        while True:
-            conn, addr = s.accept()
-            with conn:
-                data = conn.recv(4096)
-                if not data:
-                    continue
+    # aguarda conexões para dados
+    while True:
+        conn, addr = data_socket.accept()
+        with conn:
+            data = conn.recv(4096)
+            if not data:
+                continue
 
-                # Deserializa pacote
-                resultado = pickle.loads(data)
-                determinante = resultado['determinante']
-                start_time = resultado['start_time']
+            resultado = pickle.loads(data)
+            determinante = resultado['determinante']
+            start_time = resultado['start_time']
+            tempo_total = time.time() - start_time
 
-                tempo_total = time.time() - start_time
-
-                print("=== Resultado recebido ===")
-                if determinante is None:
-                    print("Matriz singular — não foi possível calcular o determinante.")
-                else:
-                    print(f"Determinante: {determinante:.4f}")
-                print(f"Tempo total: {tempo_total:.4f} segundos\n")
+            print("=== Resultado recebido ===")
+            if determinante is None:
+                print("Matriz singular — não foi possível calcular o determinante.")
+            else:
+                print(f"Determinante: {determinante:.4f}")
+            print(f"Tempo total: {tempo_total:.4f} segundos\n")
 
 if __name__ == "__main__":
     main()

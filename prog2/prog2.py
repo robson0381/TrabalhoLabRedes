@@ -1,24 +1,19 @@
 import socket
 import pickle
 import numpy as np
-import time
-import os
 
 def main():
     HOST_PROG3 = 'prog3'
-    ARQUIVO_PORTA = '/tmp/porta_prog3.txt'
+    PORT_INFO = 7000  # porta fixa
 
-    # aguarda o arquivo aparecer
-    while not os.path.exists(ARQUIVO_PORTA):
-        print(f"Aguardando {ARQUIVO_PORTA} ser criado por prog3...")
-        time.sleep(1)
-
-    # lê a porta escolhida por prog3 (escrita no arquivo)
-    with open(ARQUIVO_PORTA) as f:
-        PORT_PROG3 = int(f.read().strip())
+    # conecta para descobrir a porta
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((HOST_PROG3, PORT_INFO))
+        PORT_PROG3 = int(s.recv(1024).decode())
 
     print(f"prog2 vai conectar ao prog3 em {HOST_PROG3}:{PORT_PROG3}")
 
+    # abre socket para receber prog1
     HOST_PROG2 = '0.0.0.0'
     PORT_PROG2 = 6000
 
@@ -53,6 +48,7 @@ def main():
                     'start_time': start_time
                 }
 
+                # conecta ao prog3 para enviar resultado
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_to_prog3:
                     client_to_prog3.connect((HOST_PROG3, PORT_PROG3))
                     client_to_prog3.sendall(pickle.dumps(pacote_resultado))
