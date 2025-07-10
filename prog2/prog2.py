@@ -2,35 +2,28 @@ import socket
 import pickle
 import numpy as np
 import time
-import os
 
-def aguarda_arquivo(path, timeout=30):
-    """Espera arquivo existir até timeout (em segundos)."""
-    for _ in range(timeout):
-        if os.path.exists(path):
-            return
-        print(f"Aguardando {path} ser criado por prog3...")
-        time.sleep(1)
-    raise TimeoutError(f"Timeout esperando {path}")
+def consulta_porta_prog3(host, porta_info=7000):
+    """Conecta a prog3 na porta fixa 7000 para obter a porta dinâmica."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((host, porta_info))
+        porta_dinamica = int(s.recv(1024).decode())
+    print(f"prog2 vai conectar ao prog3 em {host}:{porta_dinamica}")
+    return porta_dinamica
 
 def main():
-    HOST_PROG3 = 'prog3'
-    PATH_PORTA_PROG3 = '/tmp/porta_prog3.txt'
+    HOST_PROG3 = 'prog3'       # Nome ou IP do container/máquina de prog3
+    HOST_PROG2 = '0.0.0.0'     # IP local para escutar prog1
+    PORT_PROG2 = 6000          # Porta fixa para prog1
 
-    HOST_PROG2 = '0.0.0.0'
-    PORT_PROG2 = 6000
-
-    # Abre socket servidor primeiro
+    # Abre servidor para receber de prog1
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((HOST_PROG2, PORT_PROG2))
         server_socket.listen()
         print(f"prog2 aguardando conexão de prog1 na porta {PORT_PROG2}...")
 
-        # Aguarda arquivo da porta de prog3
-        aguarda_arquivo(PATH_PORTA_PROG3)
-        with open(PATH_PORTA_PROG3) as f:
-            PORT_PROG3 = int(f.read().strip())
-        print(f"prog2 vai conectar ao prog3 em {HOST_PROG3}:{PORT_PROG3}")
+        # Consulta prog3 para descobrir a porta dinâmica
+        PORT_PROG3 = consulta_porta_prog3(HOST_PROG3)
 
         while True:
             conn, addr = server_socket.accept()
